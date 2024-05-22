@@ -19,7 +19,13 @@ transform = T.Compose([
 
 
 # TODO: Load the dataset
-train_loader = ...
+train_dataset = VisualOdometryDataset(
+    dataset_path="./dataset/train",
+    transform=transform,
+    sequence_length=sequence_length,
+    validation=False
+)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
 
 
 # train
@@ -30,18 +36,31 @@ criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 model.train()
-running_loss = 0.0
+losses = []
 
 for epoch in range(epochs):
+    running_loss = 0.0
 
     for images, labels, _ in tqdm(train_loader, f"Epoch {epoch + 1}:"):
 
-        # TODO: Train the model
-        ...
+        images = images.to(device)
+        labels = labels.to(device)
+
+        out = model(images)
+        
+        # Calculating the loss function
+        loss = criterion(out, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        # Storing the losses in a list for plotting
+        running_loss+=loss
+    running_loss/=len(train_loader)
+
+    losses.append(running_loss.cpu().detach())
 
     print(
-        f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss / len(train_loader)}")
-    running_loss = 0.0
-
+        f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss}")
 
 torch.save(model.state_dict(), "./vo.pt")

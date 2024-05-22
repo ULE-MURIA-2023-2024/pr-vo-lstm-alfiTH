@@ -35,6 +35,7 @@ class VisualOdometryDataset(Dataset):
                     rgb_paths, ground_truth_data)
 
             # TODO: create sequences
+            #self.sequences = [(rgb_paths[i], rgb_paths[i+1])for i in range(len(rgb_paths)-1)]
 
         self.transform = transform
         self.sequence_length = sequence_length
@@ -46,7 +47,7 @@ class VisualOdometryDataset(Dataset):
     def __getitem__(self, idx: int) -> torch.TensorType:
 
         # Load sequence of images
-        sequence_images = []
+        sequence_images = self.sequences[idx]
         ground_truth_pos = []
         timestampt = 0
 
