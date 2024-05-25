@@ -7,7 +7,11 @@ import torchvision.transforms as T
 from dataset import VisualOdometryDataset
 from model import VisualOdometryModel
 from params import *
+import copy
 
+
+PATIENCE = 5
+best_model= [torch.inf, None]
 
 # Create the visual odometry model
 model = VisualOdometryModel(hidden_size, num_layers)
@@ -18,9 +22,9 @@ transform = T.Compose([
 ])
 
 
-# TODO: Load the dataset
+# Load the dataset
 train_dataset = VisualOdometryDataset(
-    dataset_path="./dataset/train",
+    dataset_path="./dataset/train", #/rgbd_dataset_freiburg2_pioneer_slam",
     transform=transform,
     sequence_length=sequence_length,
     validation=False
@@ -47,6 +51,8 @@ for epoch in range(epochs):
         labels = labels.to(device)
 
         out = model(images)
+
+        #print(f"out: {out.shape}\n labels: {labels.shape}")
         
         # Calculating the loss function
         loss = criterion(out, labels)
@@ -60,7 +66,20 @@ for epoch in range(epochs):
 
     losses.append(running_loss.cpu().detach())
 
-    print(
-        f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss}")
+    print(f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss}")
+    
+    # Early stop
+    if best_model[0] > running_loss:
+        best_model[0] = running_loss
+        best_model[1] = copy.deepcopy(model).to("cpu")
+        patience = PATIENCE
+    else:
+        patience -= 1
+        
+    if patience == 0:
+        print("Early stopping")
+        break
 
 torch.save(model.state_dict(), "./vo.pt")
+
+

@@ -41,7 +41,7 @@ class VisualOdometryModel(nn.Module):
 
         # FC to generate the translation (3) and rotation (4)
         self.fc = nn.Sequential(
-            nn.Linear(hidden_size*pow(2, int(bidirectional), hidden_size)),
+            nn.Linear(hidden_size*pow(2, int(bidirectional)), hidden_size),
             nn.ReLU(True),
             nn.Linear(hidden_size, 7)
         )

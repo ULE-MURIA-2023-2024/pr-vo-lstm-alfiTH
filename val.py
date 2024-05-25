@@ -18,9 +18,9 @@ transform = T.Compose([
 ])
 
 
-# TODO: Load dataset
+# Load dataset
 val_dataset = VisualOdometryDataset(
-    dataset_path="./dataset/val",
+    dataset_path="./dataset/val", #/rgbd_dataset_freiburg3_walking_rpy_validation",
     transform=transform,
     sequence_length=sequence_length,
     validation=True
@@ -43,18 +43,21 @@ with torch.no_grad():
 
         images = images.to(device)
         labels = labels.to(device)
+        timestamp = timestamp.numpy().tolist()
 
-        target = model(images).cpu().numpy().tolist()[0]
-        position += target
-
-        # TODO: add the results into the validation_string
-        validation_string+=str(timestamp)
-        for pose in position:
-            validation_string+= f",{pose}"
-        validation_string+="\n"
+        target = model(images).cpu()
         
+        #For in batch
+        for idx in range(len(timestamp)):
+            position += target[idx]
 
-
+            #Text to write in txt
+            validation_string+=str(timestamp[idx])
+            for pose in position.numpy().tolist():
+                validation_string+= f",{pose}"
+            validation_string+="\n"
+        
+# Sve text in txt
 f = open("validation.txt", "a")
 f.write(validation_string)
 f.close()

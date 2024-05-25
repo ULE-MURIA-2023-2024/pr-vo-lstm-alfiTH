@@ -10,4 +10,4 @@ batch_size = 30
 
 # train
 learning_rate = 0.001
-epochs = 50
+epochs = 20
