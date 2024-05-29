@@ -14,7 +14,8 @@ PATIENCE = 5
 best_model= [torch.inf, None]
 
 # Create the visual odometry model
-model = VisualOdometryModel(hidden_size, num_layers)
+model = VisualOdometryModel(hidden_size=hidden_size, num_layers=num_layers, \
+                            bidirectional=bidirectional, lstm_dropout=lstm_dropout)
 
 transform = T.Compose([
     T.ToTensor(),
@@ -29,7 +30,7 @@ train_dataset = VisualOdometryDataset(
     sequence_length=sequence_length,
     validation=False
 )
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 
 # train
@@ -70,6 +71,7 @@ for epoch in range(epochs):
     
     # Early stop
     if best_model[0] > running_loss:
+        print("Better")
         best_model[0] = running_loss
         best_model[1] = copy.deepcopy(model).to("cpu")
         patience = PATIENCE
@@ -80,6 +82,6 @@ for epoch in range(epochs):
         print("Early stopping")
         break
 
-torch.save(model.state_dict(), "./vo.pt")
+torch.save(best_model[1], "./vo.pt")
 
 

@@ -10,7 +10,8 @@ from params import *
 
 
 # Create the visual odometry model
-model = VisualOdometryModel(hidden_size, num_layers)
+model = VisualOdometryModel(hidden_size=hidden_size, num_layers=num_layers, \
+                            bidirectional=bidirectional, lstm_dropout=lstm_dropout)
 
 transform = T.Compose([
     T.ToTensor(),
@@ -25,14 +26,14 @@ val_dataset = VisualOdometryDataset(
     sequence_length=sequence_length,
     validation=True
 )
-val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=True)
+val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 
 
 # val
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+model = torch.load("vo.pt")
 model.to(device)
-model.load_state_dict(torch.load("vo.pt"))
 model.eval()
 
 validation_string = ""
