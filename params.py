@@ -1,13 +1,13 @@
 # LSTM
-hidden_size = 5
-num_layers = 5
-bidirectional = True
-lstm_dropout = 0.30
+hidden_size = 4
+num_layers = 4
+bidirectional = False
+lstm_dropout = 0.2
 
 # dataset
 sequence_length = 2
-batch_size = 120
+batch_size = 32
 
 # train
 learning_rate = 0.001
-epochs = 10
+epochs = 5

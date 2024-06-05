@@ -82,6 +82,6 @@ for epoch in range(epochs):
         print("Early stopping")
         break
 
-torch.save(best_model[1], "./vo.pt")
+torch.save(best_model[1], f"./models/LSTM_hs{hidden_size}_nl{num_layers}_bi{bidirectional}_drop{lstm_dropout}.pt")
 
 
